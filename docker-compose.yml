@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  app:
+    environment:
+      - POSTGRES_DBNAME=service_example
+      - POSTGRES_HOST=pg
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=some_secret
+    build:
+      context: app
+    ports:
+      - "8094:8080"
+    restart: always
+    depends_on:
+      - pg
+      - migrations
+
+  migrations:
+    volumes:
+      - ./migrations/:/migrations
+    environment:
+      - POSTGRES_DBNAME=service_example
+      - POSTGRES_HOST=pg
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=some_secret
+    build:
+      context: migrations
+    depends_on:
+      - pg
+
+  pg:
+    environment:
+      - POSTGRES_DBNAME=service-example
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    build:
+      context: pg
+    ports:
+      - "5471:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
