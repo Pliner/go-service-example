@@ -28,7 +28,9 @@ func main() {
 			os.Getenv("POSTGRES_PORT"),
 			os.Getenv("POSTGRES_DBNAME"),
 		),
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: NewGormLogger(logger),
+	})
 
 	if err != nil {
 		logger.Fatal("Failed to open db", zap.Error(err))
